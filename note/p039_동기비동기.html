@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script>
+      const t = tf.tensor1d([1, 2, 3]);
+      // 비동기 API
+      //   t.data((d) => {
+      //     console.log(d);
+      //   }); => 값이 안나옴
+      const t1p = t.data((d) => d);
+      console.log(t1p);
+      //Promise {<pending>}[[Prototype]]: Promise[[PromiseState]]: "fulfilled"[[PromiseResult]]: Float32Array(3)
+
+      // 동기 API
+      console.log(t.dataSync());
+      //Float32Array(3) [1, 2, 3, buffer: ArrayBuffer(12), byteLength: 12, byteOffset: 0, length: 3, Symbol(Symbol.toStringTag): 'Float32Array']0: 11: 22: 3buffer: ArrayBuffer(12)byteLength: 12byteOffset: 0length: 3Symbol(Symbol.toStringTag): "Float32Array"[[Prototype]]: TypedArray
+    </script>
+  </head>
+  <body></body>
+</html>
