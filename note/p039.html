@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script>
+      const t0 = tf.scalar(3.14);
+      t0.print(1);
+      /*
+      Tensor
+  dtype: float32
+  rank: 0
+  shape: []
+  values:
+    3.140000104904175
+      */
+      const t1 = tf.tensor1d([1, 2, 3]);
+      t1.print();
+      t1.print(true);
+      // Tensor
+      // [1, 2, 3]
+      /*
+      Tensor
+  dtype: float32
+  rank: 1
+  shape: [3]
+  values:
+    [1, 2, 3]
+      */
+      //   const t2 = tf.tensor2d([1, 2, 3, 4], [2, 2]);
+      const t2 = tf.tensor2d([
+        [1, 2],
+        [3, 4],
+      ]);
+      t2.print();
+      /*Tensor
+     [[1, 2],
+     [3, 4]]*/
+      const t3 = tf.tensor3d([1, 2, 3, 4], [2, 2, 1]);
+      t3.print();
+      /*
+      Tensor
+    [[[1],
+      [2]],
+
+     [[3],
+      [4]]]
+      */
+      const arr1 = [];
+      for (let i = 0; i < 27; i++) {
+        arr1.push(i + 1);
+      }
+      const tt3 = tf.tensor3d(arr1, [3, 3, 3]);
+      tt3.print();
+    </script>
+  </head>
+  <body></body>
+</html>
