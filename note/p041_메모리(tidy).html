@@ -14,7 +14,9 @@
       const rt = tf.tidy(() => {
         return t1.log().square().round();
       });
-      prt(tf.memory()); //numBytes:24
+      console.log(rt);
+      t1.dispose();
+      prt(tf.memory()); //numBytes:12
     </script>
   </head>
   <body></body>
