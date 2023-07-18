@@ -66,7 +66,8 @@
             prediction[i].probability.toFixed(2);
           labelContainer.childNodes[i].innerHTML = classPrediction;
         }
-        if (prediction.probability.toFixed(2) > 99) alert("손들지마");
+        if (prediction[1].probability > 0.99)
+          console.log("손을 올리고 있네요!!");
       }
     </script>
   </body>
