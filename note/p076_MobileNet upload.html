@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+  </head>
+  <body>
+    <h1>이미지 분류 with MobileNet</h1>
+    <input type="file" id="img" />
+    <p id="predictions">인식중...</p>
+    <script>
+      const img = document.getElementById("img");
+      img.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          const image = new Image();
+          image.onload = () => {
+            mobilenet.load().then((model) => {
+              model.classify(image).then((predictions) => {
+                const pp = document.getElementById("predictions");
+                const className = predictions[0].className;
+                const probability = predictions[0].probability * 100;
+
+                // 확률이 80% 이상일 때 크고 굵은 글씨로 표시
+                if (probability >= 80) {
+                  pp.innerHTML = `<strong>${className}<br>${probability.toFixed(
+                    2
+                  )}%</strong>`;
+                } else {
+                  pp.innerHTML = `${className}<br>${probability.toFixed(2)}%`;
+                }
+              });
+            });
+          };
+          image.src = reader.result;
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+  </body>
+</html>
