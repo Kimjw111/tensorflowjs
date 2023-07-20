@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <input type="number" id="input" />
+      <button onclick="cal()">제출</button>
+      <p id="result">계산중...</p>
+      <button onclick="load()">로딩중</button>
+      <p id="loading">모델은?</p>
+    </div>
+    <script>
+      const loading = document.getElementById("loading");
+      const input = document.getElementById("input");
+      const result = document.getElementById("result");
+      const x = [113, 346, 545, 232, 332, 123];
+      const y = [385.98, 1248.08, 1984.38, 826.28, 1196.28, 422.98];
+      const Tx = tf.tensor1d(x);
+      const Ty = tf.tensor1d(y);
+      const a = tf.input({ shape: [1] });
+      const b = tf.layers.dense({ units: 8, activation: "relu" }).apply(a);
+      const c = tf.layers.dense({ units: 1 }).apply(b);
+      const model = tf.model({ inputs: a, outputs: c });
+      const param = {
+        optimizer: tf.train.adam(),
+        loss: tf.losses.meanSquaredError,
+      };
+      model.compile(param);
+      const fitParam = {
+        epochs: 2000,
+        callbacks: {
+          onEpochEnd: (e, l) => {
+            console.log("epoch", e, l, "RMSE=>", Math.sqrt(l.loss));
+          },
+        },
+      };
+      async function cal() {
+        await model.fit(Tx, Ty, fitParam);
+        const re = await model.predict(tf.tensor1d([input.value * 1]));
+        const predictionValue = re.arraySync()[0][0];
+        result.innerHTML = `예측값: ${predictionValue}`;
+        await model.save("localstorage://ex7_3_data");
+        input.addEventListener("change", () => {
+          result.innerHTML = "예측중";
+        });
+      }
+      function load() {
+        tf.loadLayersModel("localstorage://ex7_3_data").then((model) => {
+          console.log("이전모델 로드됨");
+          loading.innerHTML = JSON.stringify(model);
+        });
+      }
+    </script>
+  </body>
+</html>
