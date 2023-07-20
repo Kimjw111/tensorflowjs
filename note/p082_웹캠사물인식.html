@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+  </head>
+  <body>
+    <div id="display"></div>
+    <button id="pick">스캔시작</button>
+    <button id="stopp">정지</button>
+    <h2><div id="result"></div></h2>
+    <script>
+      const display = document.getElementById("display");
+      const pick = document.getElementById("pick");
+      const res = document.getElementById("result");
+      const stopp = document.getElementById("stopp");
+      const video = document.createElement("video");
+      display.appendChild(video);
+      video.width = 500;
+      video.height = 500;
+
+      const main = async () => {
+        const cam = await tf.data.webcam(video);
+        const img = await cam.capture();
+        const net = await mobilenet.load();
+        const result = await net.classify(img);
+        img.print();
+        tf.dispose(img);
+        res.innerHTML =
+          result[0].className +
+          "<br>" +
+          (result[0].probability * 100).toFixed(2) +
+          "%";
+      };
+      let stat;
+      pick.addEventListener("click", (stat = setInterval(main, 3000)));
+      stopp.addEventListener("click", clearInterval(stat));
+    </script>
+  </body>
+</html>
