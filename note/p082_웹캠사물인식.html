@@ -38,7 +38,9 @@
           "%";
       };
       let stat;
-      pick.addEventListener("click", (stat = setInterval(main, 3000)));
+      pick.addEventListener("click", () => {
+        stat = setInterval(main, 3000);
+      });
       stopp.addEventListener("click", clearInterval(stat));
     </script>
   </body>
