@@ -23,25 +23,30 @@
       display.appendChild(video);
       video.width = 500;
       video.height = 500;
-
-      const main = async () => {
-        const cam = await tf.data.webcam(video);
-        const img = await cam.capture();
-        const net = await mobilenet.load();
-        const result = await net.classify(img);
-        img.print();
-        tf.dispose(img);
-        res.innerHTML =
-          result[0].className +
-          "<br>" +
-          (result[0].probability * 100).toFixed(2) +
-          "%";
-      };
       let stat;
-      pick.addEventListener("click", () => {
-        stat = setInterval(main, 3000);
-      });
-      stopp.addEventListener("click", clearInterval(stat));
+      (async () => {
+        const cam = await tf.data.webcam(video);
+        async function reload() {
+          const img = await cam.capture();
+          const net = await mobilenet.load();
+          const result = await net.classify(img);
+          res.innerHTML =
+            result[0].className +
+            "<br>" +
+            (result[0].probability * 100).toFixed(2) +
+            "%";
+          tf.dispose(img);
+          tf.dispose(net);
+        }
+        pick.addEventListener("click", () => {
+          stat = setInterval(reload, 1000);
+          console.log(stat);
+        });
+        stopp.addEventListener("click", () => {
+          clearInterval(stat);
+          console.log("정지", stat);
+        });
+      })();
     </script>
   </body>
 </html>
