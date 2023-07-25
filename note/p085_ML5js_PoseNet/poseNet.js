@@ -33,14 +33,14 @@ posenet.load().then((model) => {
 button.addEventListener("click", () => {
   console.log(epose.keypoints);
   if (
-    epose.keypoints[7].score > epose.keypoints[0].score &&
-    epose.keypoints[7].score > epose.keypoints[1].score
+    epose.keypoints[7].position.y > epose.keypoints[0].position.y &&
+    epose.keypoints[7].position.y > epose.keypoints[1].position.y
   ) {
     console.log("왼손을 들엇네요!!");
   }
   if (
-    epose.keypoints[8].score > epose.keypoints[0].score &&
-    epose.keypoints[8].score > epose.keypoints[1].score
+    epose.keypoints[8].position.y > epose.keypoints[0].position.y &&
+    epose.keypoints[8].position.y > epose.keypoints[1].position.y
   ) {
     console.log("오른손을 들엇네요!!");
   }
