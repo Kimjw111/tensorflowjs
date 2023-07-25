@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.2/lib/bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+    <style>
+      #plot_div {
+        margin: 10px;
+        height: 400px;
+        border: 1px solid #ccc;
+      }
+      button,
+      input {
+        margin: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" name="" id="up" />
+    <div id="plot_div"></div>
+    <button id="predict">분석</button>
+    <script>
+      const tf = dfd.tensorflow;
+      const plot = document.getElementById("plot_div");
+      const input = document.getElementById("up");
+      const pre = document.getElementById("predict");
+      input.addEventListener("change", (e) => {
+        // console.log(e.target.files[0]); 파일 경로
+        dfd.readCSV(e.target.files[0]).then((df) => {
+          df.print();
+          df.describe().print();
+          //   console.log(df.$dataIncolumnFormat); 파일에서 필요한 값
+          const dfs = df.$dataIncolumnFormat;
+          const dfTrainAll = dfs.map((value, index) => {
+            return value.filter((v, i) => {
+              return i % 5 !== 0;
+            });
+          }); //80%
+          const dfTestAll = dfs.map((value, index) => {
+            return value.filter((v, i) => {
+              return i % 5 === 0;
+            });
+          }); //20%
+          const dfTrainTg = dfTrainAll.pop(); // 맨뒤에것만 뽑아내서 담음
+          const dfTestTg = dfTestAll.pop();
+          const dfTrain = dfTrainAll;
+          const dfTest = dfTestAll;
+          console.log(dfTrain);
+          console.log(dfTrainTg);
+          console.log(dfTest);
+          console.log(dfTestTg);
+          const dfTrainVis = dfTrain[0].map((v, i) => {
+            return { x: v, y: dfTrainTg[i] };
+          });
+          const dfTestVis = dfTest[0].map((v, i) => {
+            return { x: v, y: dfTestTg[i] };
+          });
+          const model = tf.sequential();
+          model.add(
+            tf.layers.dense({
+              inputShape: [1],
+              units: 1,
+            })
+          );
+          model.compile({
+            loss: "meanSquaredError",
+            optimizer: "adam",
+            lr: 0.1,
+          });
+          const fitParam = {
+            epochs: 1000,
+            callbacks: {
+              onEpochEnd: (e, l) => {
+                console.log("epoch: ", e, l, "RMSE=> ", Math.sqrt(l.loss));
+              },
+            },
+          };
+          const series = ["TV", "Sales"];
+          const data = { values: [dfTrainVis, dfTestVis], series };
+          const surface = { name: "Scatterplot", tab: "Charts" };
+          tfvis.render.scatterplot(plot, data);
+          pre.addEventListener("click", () => {
+            console.log(df.shape);
+            model
+              .fit(tf.tensor(dfTrain[0]), tf.tensor(dfTrainTg), fitParam)
+              .then(() => {
+                model.predict(tf.tensor(dfTest[0])).print();
+              });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

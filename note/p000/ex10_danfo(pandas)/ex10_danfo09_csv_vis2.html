@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/danfojs@1.1.2/lib/bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
     <style>
       #plot_div {
         margin: 10px;
@@ -32,8 +33,15 @@
           df.describe().print();
           //   console.log(df.$dataIncolumnFormat); 파일에서 필요한 값
           const dfs = df.$dataIncolumnFormat;
+          const dfa = dfs.map((value, index) => {
+            return value.map((v, i) => {
+              return { x: v, y: dfs[3][i] };
+            });
+          });
           const series = ["TV", "Radio", "Newspaper", "Sales"];
-          df.plot("plot_div").scatter({ config: { x: "TV", y: "Sales" } });
+          const data = { values: [dfa[0], dfa[1], dfa[2]], series };
+          const surface = { name: "Scatterplot", tab: "Charts" };
+          tfvis.render.scatterplot(plot, data);
         });
       });
     </script>
