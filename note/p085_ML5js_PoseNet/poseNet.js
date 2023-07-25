@@ -1,7 +1,9 @@
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
+const button = document.querySelector("button");
 const result_label = document.getElementById("result_label");
+let epose;
 navigator.mediaDevices
   .getUserMedia({
     video: true,
@@ -19,12 +21,28 @@ posenet.load().then((model) => {
 
   function predict() {
     model.estimateSinglePose(video).then((pose) => {
+      epose = pose;
       canvas.width = video.width;
       canvas.height = video.height;
       drawKeypoints(pose.keypoints, 0.6, context);
       drawSkeleton(pose.keypoints, 0.6, context);
     });
     requestAnimationFrame(predict);
+  }
+});
+button.addEventListener("click", () => {
+  console.log(epose.keypoints);
+  if (
+    epose.keypoints[7].score > epose.keypoints[0].score &&
+    epose.keypoints[7].score > epose.keypoints[1].score
+  ) {
+    console.log("왼손을 들엇네요!!");
+  }
+  if (
+    epose.keypoints[8].score > epose.keypoints[0].score &&
+    epose.keypoints[8].score > epose.keypoints[1].score
+  ) {
+    console.log("오른손을 들엇네요!!");
   }
 });
 // 기본예제
