@@ -15,9 +15,9 @@
  * =============================================================================
  */
 
-import * as data from './data.js';
-import * as loader from './loader.js';
-import * as ui from './ui.js';
+import * as data from "./data.js";
+import * as loader from "./loader.js";
+import * as ui from "./ui.js";
 
 let model;
 
@@ -32,27 +32,32 @@ let model;
  * @returns 훈련된 `tf.Model` 객체
  */
 async function trainModel(xTrain, yTrain, xTest, yTest) {
-  ui.status('모델을 훈련합니다... 잠시 기다려 주세요.');
+  ui.status("모델을 훈련합니다... 잠시 기다려 주세요.");
 
   const params = ui.loadTrainParametersFromUI();
 
   // 두 개의 밀집 층으로 구성된 모델을 정의합니다.
   const model = tf.sequential();
-  model.add(tf.layers.dense(
-      {units: 10, activation: 'sigmoid', inputShape: [xTrain.shape[1]]}));
-  model.add(tf.layers.dense({units: 3, activation: 'softmax'}));
+  model.add(
+    tf.layers.dense({
+      units: 10,
+      activation: "sigmoid",
+      inputShape: [xTrain.shape[1]],
+    })
+  );
+  model.add(tf.layers.dense({ units: 3, activation: "softmax" }));
   model.summary();
 
   const optimizer = tf.train.adam(params.learningRate);
   model.compile({
     optimizer: optimizer,
-    loss: 'categoricalCrossentropy',
-    metrics: ['accuracy'],
+    loss: "categoricalCrossentropy",
+    metrics: ["accuracy"],
   });
 
   const trainLogs = [];
-  const lossContainer = document.getElementById('lossCanvas');
-  const accContainer = document.getElementById('accuracyCanvas');
+  const lossContainer = document.getElementById("lossCanvas");
+  const accContainer = document.getElementById("accuracyCanvas");
   const beginMs = performance.now();
   // 모델을 훈련하기 위해 `model.fit` 메서드를 호출합니다.
   const history = await model.fit(xTrain, yTrain, {
@@ -62,21 +67,25 @@ async function trainModel(xTrain, yTrain, xTest, yTest) {
       onEpochEnd: async (epoch, logs) => {
         // 훈련 에포크가 끝날 때마다 손실과 정확도 값을 출력합니다.
         const secPerEpoch =
-            (performance.now() - beginMs) / (1000 * (epoch + 1));
-        ui.status(`모델을 훈련합니다... 약 ${
-            secPerEpoch.toFixed(4)} 초/에포크`)
+          (performance.now() - beginMs) / (1000 * (epoch + 1));
+        ui.status(
+          `모델을 훈련합니다... 약 ${secPerEpoch.toFixed(4)} 초/에포크`
+        );
         trainLogs.push(logs);
-        tfvis.show.history(lossContainer, trainLogs, ['loss', 'val_loss'],
-            {xLabel:'에포크', yLabel:'손실'})
-        tfvis.show.history(accContainer, trainLogs, ['acc', 'val_acc'],
-            {xLabel:'에포크', yLabel:'정확도'})
+        tfvis.show.history(lossContainer, trainLogs, ["loss", "val_loss"], {
+          xLabel: "에포크",
+          yLabel: "손실",
+        });
+        tfvis.show.history(accContainer, trainLogs, ["acc", "val_acc"], {
+          xLabel: "에포크",
+          yLabel: "정확도",
+        });
         calculateAndDrawConfusionMatrix(model, xTest, yTest);
       },
-    }
+    },
   });
   const secPerEpoch = (performance.now() - beginMs) / (1000 * params.epochs);
-  ui.status(
-      `모델 훈련 완료:  ${secPerEpoch.toFixed(4)} 초/에포크`);
+  ui.status(`모델 훈련 완료:  ${secPerEpoch.toFixed(4)} 초/에포크`);
   return model;
 }
 
@@ -87,7 +96,7 @@ async function trainModel(xTrain, yTrain, xTest, yTest) {
  */
 async function predictOnManualInput(model) {
   if (model == null) {
-    ui.setManualInputWinnerMessage('ERROR: 먼저 모델을 로드하거나 훈련하세요.');
+    ui.setManualInputWinnerMessage("ERROR: 먼저 모델을 로드하거나 훈련하세요.");
     return;
   }
 
@@ -117,11 +126,11 @@ async function calculateAndDrawConfusionMatrix(model, xTest, yTest) {
   });
 
   const confMatrixData = await tfvis.metrics.confusionMatrix(labels, preds);
-  const container = document.getElementById('confusion-matrix');
+  const container = document.getElementById("confusion-matrix");
   tfvis.render.confusionMatrix(
-      container,
-      {values: confMatrixData, labels: data.IRIS_CLASSES},
-      {shadeDiagonal: true, xLabel:'예측', yLabel:'레이블'},
+    container,
+    { values: confMatrixData, labels: data.IRIS_CLASSES },
+    { shadeDiagonal: true, xLabel: "예측", yLabel: "레이블" }
   );
 
   tf.dispose([preds, labels]);
@@ -143,7 +152,11 @@ async function evaluateModelOnTestData(model, xTest, yTest) {
     const predictOut = model.predict(xTest);
     const yPred = predictOut.argMax(-1);
     ui.renderEvaluateTable(
-        xData, yTrue, yPred.dataSync(), predictOut.dataSync());
+      xData,
+      yTrue,
+      yPred.dataSync(),
+      predictOut.dataSync()
+    );
     calculateAndDrawConfusionMatrix(model, xTest, yTest);
   });
 
@@ -151,29 +164,30 @@ async function evaluateModelOnTestData(model, xTest, yTest) {
 }
 
 const HOSTED_MODEL_JSON_URL =
-    'https://storage.googleapis.com/tfjs-models/tfjs/iris_v1/model.json';
+  "https://storage.googleapis.com/tfjs-models/tfjs/iris_v1/model.json";
 
 /**
  * 붓꽃 데모의 메인 함수
  */
 async function iris() {
-  const [xTrain, yTrain, xTest, yTest] = data.getIrisData(0.15);
+  const [xTrain, yTrain, xTest, yTest] = await data.getIrisData(0.15);
 
-  const localLoadButton = document.getElementById('load-local');
-  const localSaveButton = document.getElementById('save-local');
-  const localRemoveButton = document.getElementById('remove-local');
+  const localLoadButton = document.getElementById("load-local");
+  const localSaveButton = document.getElementById("save-local");
+  const localRemoveButton = document.getElementById("remove-local");
 
-  document.getElementById('train-from-scratch')
-      .addEventListener('click', async () => {
-        model = await trainModel(xTrain, yTrain, xTest, yTest);
-        await evaluateModelOnTestData(model, xTest, yTest);
-        localSaveButton.disabled = false;
-      });
+  document
+    .getElementById("train-from-scratch")
+    .addEventListener("click", async () => {
+      model = await trainModel(xTrain, yTrain, xTest, yTest);
+      await evaluateModelOnTestData(model, xTest, yTest);
+      localSaveButton.disabled = false;
+    });
 
   if (await loader.urlExists(HOSTED_MODEL_JSON_URL)) {
-    ui.status('모델 위치: ' + HOSTED_MODEL_JSON_URL);
-    const button = document.getElementById('load-pretrained-remote');
-    button.addEventListener('click', async () => {
+    ui.status("모델 위치: " + HOSTED_MODEL_JSON_URL);
+    const button = document.getElementById("load-pretrained-remote");
+    button.addEventListener("click", async () => {
       ui.clearEvaluateTable();
       model = await loader.loadHostedPretrainedModel(HOSTED_MODEL_JSON_URL);
       await predictOnManualInput(model);
@@ -181,24 +195,24 @@ async function iris() {
     });
   }
 
-  localLoadButton.addEventListener('click', async () => {
+  localLoadButton.addEventListener("click", async () => {
     model = await loader.loadModelLocally();
     await predictOnManualInput(model);
   });
 
-  localSaveButton.addEventListener('click', async () => {
+  localSaveButton.addEventListener("click", async () => {
     await loader.saveModelLocally(model);
     await loader.updateLocalModelStatus();
   });
 
-  localRemoveButton.addEventListener('click', async () => {
+  localRemoveButton.addEventListener("click", async () => {
     await loader.removeModelLocally();
     await loader.updateLocalModelStatus();
   });
 
   await loader.updateLocalModelStatus();
 
-  ui.status('대기중');
+  ui.status("대기중");
   ui.wireUpEvaluateTableCallbacks(() => predictOnManualInput(model));
 }
 

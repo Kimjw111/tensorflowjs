@@ -174,23 +174,23 @@ export const IRIS_NUM_CLASSES = IRIS_CLASSES.length;
 //   [6.2, 3.4, 5.4, 2.3, 2],
 //   [5.9, 3.0, 5.1, 1.8, 2],
 // ];
-function load() {
-  return dfd.readCSV("./IRIS.csv").then((csv) => {
-    return csv.$data.map((v) => {
-      if (v[4] === IRIS_CLASSES[0]) {
-        v[4] = 0;
-      }
-      if (v[4] === IRIS_CLASSES[1]) {
-        v[4] = 1;
-      }
-      if (v[4] === IRIS_CLASSES[2]) {
-        v[4] = 2;
-      }
-      return v;
-    });
+dfd.readCSV("./IRIS.csv").then((csv) => {
+  const data = csv.$data;
+  const irisDate = data.map((v) => {
+    if (v[4] === IRIS_CLASSES[0]) {
+      v[4] = 0;
+    }
+    if (v[4] === IRIS_CLASSES[1]) {
+      v[4] = 1;
+    }
+    if (v[4] === IRIS_CLASSES[2]) {
+      v[4] = 2;
+    }
+    return v;
   });
-}
-
+  IRIS_DATA = [...irisDate];
+  console.log(IRIS_DATA);
+});
 function convertToTensors(data, targets, testSplit) {
   const numExamples = data.length;
   if (numExamples !== targets.length) {
@@ -234,9 +234,7 @@ function convertToTensors(data, targets, testSplit) {
   return [xTrain, yTrain, xTest, yTest];
 }
 
-export async function getIrisData(testSplit) {
-  const IRIS_DATA = await load();
-  console.log(IRIS_DATA);
+export function getIrisData(testSplit) {
   return tf.tidy(() => {
     const dataByClass = [];
     const targetsByClass = [];
