@@ -6,15 +6,24 @@
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
     <script>
-      const input = tf.input({ shape: [784] });
+      // Create an input layer with shape [784]
+      const input = tf.input({ shape: [784] })
+
+      // Create a dense layer with 16 units and ReLU activation function, and apply it to the input layer
       const dense1 = tf.layers
-        .dense({ units: 16, activation: "relu" })
-        .apply(input);
+        .dense({ units: 16, activation: 'relu' })
+        .apply(input)
+
+      // Create another dense layer with 10 units and softmax activation function, and apply it to the previous dense layer
       const dense2 = tf.layers
-        .dense({ units: 10, activation: "softmax" })
-        .apply(dense1);
-      const model = tf.model({ inputs: input, outputs: dense2 });
-      model.summary();
+        .dense({ units: 10, activation: 'softmax' })
+        .apply(dense1)
+
+      // Create a model with the input and output layers
+      const model = tf.model({ inputs: input, outputs: dense2 })
+
+      // Print the summary of the model
+      model.summary()
     </script>
   </head>
   <body></body>
