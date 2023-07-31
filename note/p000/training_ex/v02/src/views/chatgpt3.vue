@@ -14,25 +14,33 @@
     <input
       placeholder="질문할 내용입력하기"
       v-model="inData"
-      @keyup.enter="gpt()"
+      @keyup.enter="gpt3()"
     />
-    <button @click="gpt()">묻기</button>
+    <button @click="gpt3()">묻기</button>
   </div>
 </template>
 <script>
-import { chatgptApi } from '../../public/chatgpt'
+import { gpt3 } from '../../public/풀이2.js'
 export default {
   data() {
     return {
       inData: '',
       resp: ''
+      // init: '안녕하세요. 여기는 GPT-3.5 챗봇입니다.', // 기본 정보를 설정합니다.
+      // history: '' // 이전 대화 기록을 저장할 변수입니다.
     }
   },
   methods: {
-    gpt: async function () {
-      const ask = this.inData
-      const answer = await chatgptApi(ask, 32, 0.6, 0.7, 1)
+    gpt3: async function () {
+      this.resp = '타이핑중'
+      const start = this.inData
+      const answer = await gpt3(start)
       this.resp = answer
+      // this.init + this.history +  // 현재 입력 + 기본 정보 + 이전 대화 기록
+      // this.history += `인간: ${this.inData}\nAI: ${answer}\n` // 이전 대화 기록에 새로운 대화를 추가합니다.
+      // if (this.history.length > 4000) {
+      //   this.history = ''
+      // }
     }
   }
 }
@@ -40,10 +48,10 @@ export default {
 <style scoped>
 textarea {
   font-size: 1.1em;
-  color: black;
+  color: rgb(240, 177, 177);
   resize: none;
   font-weight: bold;
-  background-color: bisque;
+  background-color: rgb(203, 225, 250);
 }
 input {
   width: 210px;

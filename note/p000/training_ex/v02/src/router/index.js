@@ -8,13 +8,21 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/gpt3',
-    name: 'gpt3',
+    path: '/chatgpt3',
+    name: 'chatgpt3',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/chatgpt3.vue')
+  },
+  {
+    path: '/gpt3',
+    name: 'gpt3',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/gpt3.vue')
   }
 ]
 

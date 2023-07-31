@@ -1,7 +1,8 @@
 <template>
   <nav>
     <router-link to="/">KOGPT(카카오)</router-link> |
-    <router-link to="/gpt3">GPT3.5(OpenAI)</router-link>
+    <router-link to="/gpt3">GPT3.5(OpenAI)</router-link> |
+    <router-link to="/chatgpt3">GPT3.5(풀이)</router-link>
   </nav>
   <keep-alive>
     <router-view />
