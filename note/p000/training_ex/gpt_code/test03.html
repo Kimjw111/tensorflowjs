@@ -1,0 +1,163 @@
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Layout with Buttons</title>
+    <style>
+      /* CSS code for the layout */
+      /* Set the layout to have a header, navigation, content, sidebar, and footer */
+      header {
+        background-color: lightblue;
+        padding: 20px;
+      }
+
+      nav {
+        background-color: lightgray;
+        padding: 10px;
+      }
+
+      main {
+        background-color: white;
+        padding: 20px;
+      }
+
+      aside {
+        background-color: lightgray;
+        padding: 10px;
+      }
+
+      footer {
+        background-color: lightblue;
+        padding: 20px;
+      }
+
+      /* CSS code for the buttons */
+      .button {
+        background-color: yellow;
+        color: red;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+    </style>
+    <script>
+      // JavaScript code for button functionality
+      // Function to turn on the webcam
+      function turnOnWebcam() {
+        // Check if the browser supports getUserMedia API
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          // Get access to the webcam
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(function (stream) {
+              // Attach the webcam stream to the video element
+              var videoElement = document.getElementById('videoElement')
+              videoElement.srcObject = stream
+            })
+            .catch(function (error) {
+              // Display an error message if access to the webcam is denied
+              console.error('Error accessing webcam:', error)
+            })
+        } else {
+          // Display an error message if the browser does not support getUserMedia API
+          console.error('getUserMedia is not supported in this browser')
+        }
+      }
+
+      // Function to analyze webcam content with PoseNet
+      function analyzeWebcamContent() {
+        // Access the webcam and display the video stream
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(function (stream) {
+            var video = document.getElementById('videoElement')
+            video.srcObject = stream
+          })
+          .catch(function (err) {
+            console.log('An error occurred: ' + err)
+          })
+
+        // Load PoseNet model
+        posenet
+          .load()
+          .then(function (net) {
+            // Start analyzing webcam content
+            setInterval(function () {
+              // Get video element and its dimensions
+              var video = document.getElementById('videoElement')
+              var videoWidth = video.videoWidth
+              var videoHeight = video.videoHeight
+
+              // Create a canvas element to draw the video frame
+              var canvas = document.createElement('canvas')
+              canvas.width = videoWidth
+              canvas.height = videoHeight
+              var ctx = canvas.getContext('2d')
+
+              // Draw the current video frame on the canvas
+              ctx.drawImage(video, 0, 0, videoWidth, videoHeight)
+
+              // Analyze the pose in the video frame using PoseNet
+              net
+                .estimateSinglePose(canvas, {
+                  flipHorizontal: false
+                })
+                .then(function (pose) {
+                  // Process the pose data and perform further analysis
+                  console.log(pose)
+                })
+                .catch(function (err) {
+                  console.log('An error occurred: ' + err)
+                })
+            }, 1000) // Analyze every 1 second
+          })
+          .catch(function (err) {
+            console.log('An error occurred: ' + err)
+          })
+      }
+
+      // Function to display a notification message
+      function displayNotification() {
+        alert('님좀짱인듯')
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Header section -->
+    <header>
+      <!-- Add content for the header here -->
+      ㅇㅇ 웹사이트
+    </header>
+
+    <!-- Navigation section -->
+    <nav>
+      <!-- Add content for the navigation here -->
+    </nav>
+
+    <!-- Content section -->
+    <main>
+      <!-- Add content for the main content here -->
+      <!-- Create three buttons -->
+      <button class="button" onclick="turnOnWebcam()">Button 1</button>
+      <button class="button" onclick="analyzeWebcamContent()">Button 2</button>
+      <button class="button" onclick="displayNotification()">Button 3</button>
+      <video id="videoElement"></video>
+    </main>
+
+    <!-- Sidebar section -->
+    <aside>
+      <!-- Add content for the sidebar here -->
+    </aside>
+
+    <!-- Footer section -->
+    <footer>
+      <!-- Add content for the footer here -->
+    </footer>
+  </body>
+</html>
+``` ``` 위의 코드에서 JavaScript 부분을 추가하여 요구사항을 구현했습니다. 첫번째
+버튼은 `turnOnWebcam()` 함수를 호출하여 웹캠을 켜게하고, 두번째 버튼은
+`analyzeWebcamContent()` 함수를 호출하여 posenet으로 웹캠 내용을 분석하는 기능이
+동작하도록 하였습니다. 세번째 버튼은 `displayNotification()` 함수를 호출하여
+알림창으로 '님좀짱인듯'이라는 표시가 뜨게하였습니다.
