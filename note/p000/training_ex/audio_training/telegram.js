@@ -2,37 +2,47 @@ require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api')
 const axios = require('axios')
 
-// 텔레그램 봇 토큰
 const TELEGRAM_TOKEN = process.env.bottk
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true })
 
-// OpenAI API 키
 const OPENAI_API_KEY = process.env.gpttk
 
-// 텔레그램 봇 메시지 수신 처리
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id
-  const userId = msg.from.id
   const userInput = msg.text
 
   try {
-    // GPT-3.5-turbo를 사용하여 응답 생성
     const gptResponse = await axios.post(
-      'https://api.openai.com/v1/engines/text-davinci-003/completions',
+      'https://api.openai.com/v1/chat/completions',
       {
-        prompt: userInput,
-        max_tokens: 150
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant.'
+          },
+          {
+            role: 'user',
+            content: userInput
+          }
+        ]
       },
       {
         headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`
+          Authorization: 'Bearer ' + OPENAI_API_KEY,
+          'Content-Type': 'application/json'
         }
       }
     )
-
-    // GPT 응답에서 줄바꿈 문자를 공백으로 치환하여 텔레그램 봇을 통해 사용자에게 보냄
-    const gptReply = gptResponse.data.choices[0].text.trim().replace(/\n/g, ' ')
-    bot.sendMessage(chatId, gptReply)
+    if (gptResponse.data.choices && gptResponse.data.choices.length > 0) {
+      const gptReply = gptResponse.data.choices[0].message.content
+        .trim()
+        .replace(/\n/g, ' ')
+      bot.sendMessage(chatId, gptReply)
+    } else {
+      console.error('Error: Empty or invalid response from OpenAI API')
+      bot.sendMessage(chatId, '요청 처리 중 오류가 발생했습니다.')
+    }
   } catch (error) {
     console.error('Error:', error.message)
     bot.sendMessage(chatId, '요청 처리 중 오류가 발생했습니다.')
