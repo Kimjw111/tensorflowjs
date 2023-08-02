@@ -12,6 +12,7 @@ const OPENAI_API_KEY = process.env.gpttk
 // 텔레그램 봇 메시지 수신 처리
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id
+  const userId = msg.from.id
   const userInput = msg.text
 
   try {
@@ -29,8 +30,9 @@ bot.on('message', async (msg) => {
       }
     )
 
-    // GPT 응답을 텔레그램 봇을 통해 사용자에게 보냅니다.
-    bot.sendMessage(chatId, gptResponse.data.choices[0].text)
+    // GPT 응답에서 줄바꿈 문자를 공백으로 치환하여 텔레그램 봇을 통해 사용자에게 보냄
+    const gptReply = gptResponse.data.choices[0].text.trim().replace(/\n/g, ' ')
+    bot.sendMessage(chatId, gptReply)
   } catch (error) {
     console.error('Error:', error.message)
     bot.sendMessage(chatId, '요청 처리 중 오류가 발생했습니다.')
