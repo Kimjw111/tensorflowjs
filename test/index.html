@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      input[type='file'],
+      button {
+        margin-bottom: 10px;
+      }
+      button {
+        cursor: pointer;
+        padding: 8px 12px;
+        background-color: #f57105;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        outline: none;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      #train-chart-container {
+        width: 500px;
+        height: 300px;
+        margin-top: 20px;
+      }
+      #test-chart-container {
+        width: 500px;
+        height: 300px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 엑셀 파일 올릴곳 -->
+    <input type="file" onchange="readExcel()" />
+    <!-- 파일 분석 하는곳 -->
+    <button onclick="modelRun()" disabled>분석시작</button>
+    <script>
+      let trainData = []
+      let testData = []
+      let model
+
+      /* 엑셀로부터 데이터 추출 */
+      const readExcel = () => {
+        const input = document.querySelector('input[type="file"]')
+        const file = input.files[0]
+        const reader = new FileReader()
+
+        reader.onload = function () {
+          const data = reader.result
+          const workBook = XLSX.read(data, { type: 'binary' })
+
+          // 훈련 데이터 시트 읽기
+          const trainSheetName = workBook.SheetNames[0]
+          const trainSheet = workBook.Sheets[trainSheetName]
+          const trainDataJson = XLSX.utils.sheet_to_json(trainSheet, {
+            header: 1
+          })
+          trainData = trainDataJson.slice(1) // 헤더를 제외한 데이터
+
+          // 테스트 데이터 시트 읽기
+          const testSheetName = workBook.SheetNames[1]
+          const testSheet = workBook.Sheets[testSheetName]
+          const testDataJson = XLSX.utils.sheet_to_json(testSheet, {
+            header: 1
+          })
+          testData = testDataJson.slice(1) // 헤더를 제외한 데이터
+
+          // 데이터를 성공적으로 읽은 후에 분석 버튼 활성화
+          const analyzeButton = document.querySelector('button')
+          analyzeButton.disabled = false
+        }
+
+        reader.readAsBinaryString(file)
+      }
+
+      /* 1. 지도학습 - 데이터 준비 */
+      const modelRun = async () => {
+        // 훈련 데이터에서 아버지의 키값으로 아들의 키값을 추출
+        const xTrain = trainData.map((v) => [v[0]])
+        const yTrain = trainData.map((v) => [v[1]])
+        console.log(xTrain)
+        console.log(yTrain)
+        // 테스트 데이터에서 아버지의 키값으로 아들의 키값을 추출
+        const xTest = testData.map((v) => [v[0]])
+        const yTest = testData.map((v) => [v[1]])
+
+        // 데이터를 Tensor로 변환
+        const xTrainTensor = tf.tensor2d(xTrain)
+        const yTrainTensor = tf.tensor2d(yTrain)
+        const xTestTensor = tf.tensor2d(xTest)
+        const yTestTensor = tf.tensor2d(yTest)
+
+        /* 2. 모델 만들기 */
+        const xx = tf.input({ shape: [1] })
+        const h1 = tf.layers
+          .dense({ units: 50, activation: 'sigmoid' })
+          .apply(xx)
+        const h2 = tf.layers.dense({ units: 50, activation: 'relu' }).apply(h1)
+        const yy = tf.layers.dense({ units: 1 }).apply(h2)
+        model = tf.model({ inputs: xx, outputs: yy })
+        const cparam = {
+          optimizer: tf.train.adam(),
+          loss: tf.losses.meanSquaredError
+        }
+        model.compile(cparam)
+
+        /* 3. 모델로 훈련시작 */
+        const fparam = {
+          epochs: 200,
+          batchSize: 64,
+          callbacks: [
+            tfvis.show.fitCallbacks(
+              { name: 'Training Performance' },
+              ['loss', 'mse'],
+              { height: 200, callbacks: ['onEpochEnd'] }
+            ),
+            {
+              onEpochEnd: (epoch, logs) => {
+                console.log(
+                  'epoch',
+                  epoch,
+                  logs,
+                  'RMSE=>',
+                  Math.sqrt(logs.loss)
+                )
+              }
+            }
+          ]
+        }
+        await model.fit(xTrainTensor, yTrainTensor, fparam)
+        await model.predict(tf.tensor([175])).print()
+        await model.summary()
+      }
+    </script>
+  </body>
+</html>
