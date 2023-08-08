@@ -3,6 +3,7 @@
     <h1>MobileNet Example</h1>
     <hr />
     <input type="file" @change="handleFileUpload" />
+    <img v-if="imageSrc" :src="imageSrc" alt="Uploaded Image" />
     <p>{{ result }}</p>
   </div>
 </template>
@@ -14,7 +15,8 @@ import * as mobilenet from '@tensorflow-models/mobilenet'
 export default {
   data() {
     return {
-      result: ''
+      result: '',
+      imageSrc: null
     }
   },
   methods: {
@@ -39,6 +41,8 @@ export default {
 
         // 텐서 메모리 해제
         image.dispose()
+        // 업로드한 이미지 보여주기
+        this.imageSrc = URL.createObjectURL(file)
       } else {
         this.result = '파일을 선택해주세요.'
       }
@@ -63,3 +67,9 @@ export default {
   }
 }
 </script>
+<style>
+img {
+  width: 45%;
+  height: 45%;
+}
+</style>
