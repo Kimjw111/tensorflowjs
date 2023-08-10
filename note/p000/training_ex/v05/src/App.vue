@@ -1,7 +1,8 @@
 <template>
   <nav>
-    <router-link to="/">Page1</router-link> |
-    <router-link to="/page2">Page2</router-link>
+    <router-link to="/">1. 레이아웃</router-link> |
+    <router-link to="/page2">2. MobileNet</router-link> |
+    <router-link to="/page3">3. 외부데이터(setup)</router-link>
   </nav>
   <router-view />
 </template>
