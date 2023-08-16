@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <div id="app">
+      {{message}}
+      <!-- 전역 컴포넌트 표시 -->
+      <h1>전역 컴포넌트</h1>
+      <Gcom></Gcom>
+      <hr />
+      <!-- 로컬 컴포넌트 표시 -->
+      <h1>로컬 컴포넌트</h1>
+      <Lcom></Lcom>
+    </div>
+    <script>
+      const { createApp, ref } = Vue
+      const Lcom = {
+        template: '<div><mark>지역 컴포넌트를 등록함.</mark></div>'
+      }
+      createApp({
+        setup() {
+          return {
+            message: ref('안녕하세요')
+          }
+        },
+        components: {
+          Lcom
+        }
+      })
+        .component('Gcom', {
+          template: '<div><em>전역 컴포넌트를 등록함.</em></div>'
+        })
+        .mount('#app')
+    </script>
+  </body>
+</html>

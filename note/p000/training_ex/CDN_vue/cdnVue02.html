@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cdnVue</title>
+  </head>
+  <body>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <div id="app">
+      <div>{{ message }}</div>
+      <input type="text" v-model="data" /><br />
+      <div>{{data}}</div>
+      <hr />
+      <input type="text" v-model="data1" /><br />
+      <div>{{data1}}</div>
+    </div>
+    <script>
+      const { createApp, ref } = Vue
+
+      createApp({
+        data() {
+          return {
+            data: '기본vue형식 데이터'
+          }
+        },
+        setup() {
+          return {
+            message: '안녕하세요. CDN vue 연습중 입니다.',
+            data1: ref('변경될까요?')
+          }
+        }
+      }).mount('#app')
+    </script>
+  </body>
+</html>
